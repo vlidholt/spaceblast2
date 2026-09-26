@@ -40,6 +40,7 @@ dependencies:
   vector_math: ^2.4.3
   hooks: ^2.2.0
   web: ^1.1.1
+  spritewidget: ^2.0.1
 
 dev_dependencies:
   # Used for agents to drive the app through the Dart MCP
@@ -78,6 +79,8 @@ flutter:
     - assets/sprites/
     - assets/textures/
     - assets/audio/
+    # The original 2D game's sprite sheets (split-screen demo).
+    - assets/classic/
     # Models load at runtime from .glb (compact JPEG textures). They live
     # outside assets/ so the flutter_scene hook does not also convert them.
     - models/

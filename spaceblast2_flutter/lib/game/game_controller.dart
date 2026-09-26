@@ -249,10 +249,16 @@ class GameController extends ChangeNotifier {
     alpha = (_accumulator / GameWorld.dt).clamp(0.0, 1.0);
   }
 
+  /// Extra consumers of simulation events (the split-screen classic view).
+  final List<void Function(GameEvent event)> eventListeners = [];
+
   void _processEvents() {
     final events = List<GameEvent>.of(world.events);
     world.events.clear();
     for (final e in events) {
+      for (final listener in eventListeners) {
+        listener(e);
+      }
       switch (e) {
         case SoundEvent s:
           audio.playEffect(s.name);

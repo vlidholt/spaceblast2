@@ -10,23 +10,36 @@ import 'power_up_type.dart';
 class PersistentGameState extends ChangeNotifier {
   static const _prefsKey = 'game_prefs';
 
+  /// Demo unlocks (0-based, shown as +1): level 5 can be started, and is
+  /// selected on launch, the laser is at least level 8 and there are at
+  /// least [demoCoins] coins.
+  static const demoStartingLevel = 4;
+  static const demoLaserLevel = 7;
+  static const demoCoins = 1337;
+
   Future<void> load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final json = prefs.getString(_prefsKey);
-      if (json == null) return;
-
-      final Map data = const JsonDecoder().convert(json);
-      coins = data['coins'];
-      _powerupLevels = (data['powerUpLevels'] as List).cast<int>();
-      _currentStartingLevel = data['currentStartingLevel'];
-      maxStartingLevel = data['maxStartingLevel'];
-      laserLevel = data['laserLevel'];
-      _lastScore = data['lastScore'];
-      weeklyBestScore = data['bestScore'];
+      if (json != null) {
+        final Map data = const JsonDecoder().convert(json);
+        coins = data['coins'];
+        _powerupLevels = (data['powerUpLevels'] as List).cast<int>();
+        _currentStartingLevel = data['currentStartingLevel'];
+        maxStartingLevel = data['maxStartingLevel'];
+        laserLevel = data['laserLevel'];
+        _lastScore = data['lastScore'];
+        weeklyBestScore = data['bestScore'];
+      }
     } catch (e) {
       debugPrint('Failed to load game state: $e');
     }
+    if (maxStartingLevel < demoStartingLevel) {
+      maxStartingLevel = demoStartingLevel;
+    }
+    _currentStartingLevel = demoStartingLevel;
+    if (laserLevel < demoLaserLevel) laserLevel = demoLaserLevel;
+    if (coins < demoCoins) coins = demoCoins;
   }
 
   Future<void> store() async {

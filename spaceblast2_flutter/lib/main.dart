@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'game/ui/game_shell.dart';
+import 'classic/split_screen_shell.dart';
 import 'game/ui/theme.dart';
 
 void main() {
@@ -28,7 +28,7 @@ class SpaceBlastApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      home: const Scaffold(body: GameShell()),
+      home: const Scaffold(body: SplitScreenShell()),
     );
   }
 }

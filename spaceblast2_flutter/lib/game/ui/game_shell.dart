@@ -15,14 +15,18 @@ import 'world_overlay.dart';
 
 /// Hosts the game: loading screen, 3D view, overlays and input.
 class GameShell extends StatefulWidget {
-  const GameShell({super.key});
+  const GameShell({super.key, this.controller});
+
+  /// A controller owned by the caller (the split-screen demo shares it with
+  /// the classic view). When null, the shell creates and owns one.
+  final GameController? controller;
 
   @override
   State<GameShell> createState() => _GameShellState();
 }
 
 class _GameShellState extends State<GameShell> {
-  final GameController _controller = GameController();
+  late final GameController _controller = widget.controller ?? GameController();
   UiImages? _images;
   Object? _error;
 
@@ -50,7 +54,7 @@ class _GameShellState extends State<GameShell> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
 
