@@ -1,0 +1,56 @@
+material {
+  name: "NebulaLayer",
+  shading_model: unlit,
+  blending: alpha,
+  culling: none,
+  parameters: [
+    // x: world units per tile, y: opacity, z: brightness, w: layer seed.
+    { type: vec4, name: layer, default: [8, 0.5, 1, 0] },
+    // rgb: color tint.
+    { type: vec4, name: tint, default: [1, 1, 1, 1] },
+    // x: time in seconds, y: boss mood 0..1, z: speed boost 0..1, w: y offset.
+    { type: vec4, name: state, default: [0, 0, 0, 0] },
+    { type: sampler2d, name: nebula_texture, hint: default_white },
+  ],
+}
+
+fragment {
+  vec3 SrgbToLinear3(vec3 c) { return pow(c, vec3(2.2)); }
+
+  void Surface(inout MaterialInputs material) {
+    vec3 world = GetWorldPosition();
+    vec2 p = world.xy + vec2(0.0, material_params.state.w);
+    float time = material_params.state.x;
+    float boss = material_params.state.y;
+    float seed = material_params.layer.w;
+    float tile = material_params.layer.x;
+
+    // Two samples of the same tileable nebula, drifting against each other,
+    // give slowly evolving clouds instead of a static texture.
+    vec2 uv = p / tile + vec2(seed * 0.37, seed * 0.71);
+    uv.y = -uv.y;
+    vec2 warp = vec2(sin(uv.y * 5.0 + time * 0.13), cos(uv.x * 4.0 - time * 0.11)) * 0.015;
+    vec4 a = texture(nebula_texture, uv + warp + vec2(time * 0.006, 0.0), 1.0);
+    vec4 b = texture(nebula_texture, uv * 1.7 + vec2(0.31, 0.17) - vec2(0.0, time * 0.004), 1.0);
+
+    float density = a.a * 0.75 + b.a * 0.45 * a.a;
+    // A very low frequency mask breaks the clouds into patches with dark
+    // gaps between them.
+    vec2 maskUv = uv * 0.21 + vec2(seed * 0.13, seed * 0.29);
+    float mask = smoothstep(0.5, 0.95, texture(nebula_texture, maskUv).a);
+    mask *= mask;
+    density *= mask;
+    vec3 col = SrgbToLinear3(a.rgb) * 0.8 + SrgbToLinear3(b.rgb) * 0.4;
+
+    vec3 tint = material_params.tint.rgb;
+    vec3 bossTint = vec3(1.5, 0.35, 0.45);
+    tint *= mix(vec3(1.0), bossTint, boss * 0.85);
+
+    col *= tint * material_params.layer.z;
+
+    // Mostly additive: a low alpha lets the glow add light without hiding
+    // the stars behind it.
+    float alpha = clamp(density * material_params.layer.y, 0.0, 1.0);
+    material.base_color = vec4(col * (1.0 + density), alpha * 0.35);
+  }
+}

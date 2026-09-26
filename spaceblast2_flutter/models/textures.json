@@ -1,0 +1,62 @@
+{
+  "asteroid_big_0": {
+    "base": "models/textures/asteroid_big_0_base.jpg"
+  },
+  "asteroid_big_1": {
+    "base": "models/textures/asteroid_big_1_base.jpg"
+  },
+  "asteroid_big_2": {
+    "base": "models/textures/asteroid_big_2_base.jpg"
+  },
+  "asteroid_small_0": {
+    "base": "models/textures/asteroid_small_0_base.jpg"
+  },
+  "asteroid_small_1": {
+    "base": "models/textures/asteroid_small_1_base.jpg"
+  },
+  "asteroid_small_2": {
+    "base": "models/textures/asteroid_small_2_base.jpg"
+  },
+  "crystal_0": {
+    "base": "models/textures/crystal_0_base.png",
+    "emissive": "models/textures/crystal_0_emissive.jpg"
+  },
+  "crystal_1": {
+    "base": "models/textures/crystal_1_base.png",
+    "emissive": "models/textures/crystal_1_emissive.jpg"
+  },
+  "crystal_2": {
+    "base": "models/textures/crystal_2_base.png",
+    "emissive": "models/textures/crystal_2_emissive.jpg"
+  },
+  "enemy_boss_0": {
+    "base": "models/textures/enemy_boss_0_base.jpg"
+  },
+  "enemy_boss_1": {
+    "base": "models/textures/enemy_boss_1_base.jpg"
+  },
+  "enemy_boss_2": {
+    "base": "models/textures/enemy_boss_2_base.jpg"
+  },
+  "enemy_destroyer_0": {
+    "base": "models/textures/enemy_destroyer_0_base.jpg"
+  },
+  "enemy_destroyer_1": {
+    "base": "models/textures/enemy_destroyer_1_base.jpg"
+  },
+  "enemy_destroyer_2": {
+    "base": "models/textures/enemy_destroyer_2_base.jpg"
+  },
+  "enemy_scout_0": {
+    "base": "models/textures/enemy_scout_0_base.jpg"
+  },
+  "enemy_scout_1": {
+    "base": "models/textures/enemy_scout_1_base.jpg"
+  },
+  "enemy_scout_2": {
+    "base": "models/textures/enemy_scout_2_base.jpg"
+  },
+  "ship": {
+    "base": "models/textures/ship_base.jpg"
+  }
+}

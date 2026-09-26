@@ -1,0 +1,56 @@
+material {
+  name: "SpaceBackdrop",
+  shading_model: unlit,
+  blending: opaque,
+  culling: none,
+  parameters: [
+    // xy: world units per texture tile (starfield, deep nebula), zw: offset.
+    { type: vec4, name: tiling, default: [10, 24, 0, 0] },
+    // rgb: mood tint, a: overall brightness.
+    { type: vec4, name: tint, default: [1, 1, 1, 1] },
+    // x: time in seconds, y: boss mood 0..1, z: speed boost 0..1.
+    { type: vec4, name: state, default: [0, 0, 0, 0] },
+    { type: sampler2d, name: starfield_texture, hint: default_white },
+    { type: sampler2d, name: nebula_texture, hint: default_white },
+  ],
+}
+
+fragment {
+  vec3 SrgbToLinear3(vec3 c) { return pow(c, vec3(2.2)); }
+
+  void Surface(inout MaterialInputs material) {
+    vec3 world = GetWorldPosition();
+    vec2 p = world.xy + material_params.tiling.zw;
+    float time = material_params.state.x;
+    float boss = material_params.state.y;
+
+    // The classic starfield, tiled in world space. Its depth gives it the
+    // same slow parallax the 2D game faked with a 0.1x scroll.
+    vec2 starUv = p / material_params.tiling.x;
+    starUv.y = -starUv.y;
+    // A mip bias fakes the depth-of-field blur of this distant layer.
+    vec3 stars = SrgbToLinear3(texture(starfield_texture, starUv, 1.6).rgb);
+
+    // A very large, dim nebula layer to break up the repetition.
+    vec2 nebUv = p / material_params.tiling.y +
+        vec2(time * 0.004, 0.0);
+    nebUv.y = -nebUv.y;
+    vec4 neb = texture(nebula_texture, nebUv, 2.0);
+    vec3 nebColor = SrgbToLinear3(neb.rgb) * neb.a;
+
+    // Slow color drift so large areas do not look flat.
+    float band = 0.5 + 0.5 * sin(p.y * 0.035 + p.x * 0.02 + time * 0.05);
+    vec3 deepA = vec3(0.004, 0.003, 0.016);
+    vec3 deepB = vec3(0.012, 0.003, 0.018);
+    vec3 base = mix(deepA, deepB, band);
+
+    vec3 color = base + stars * 0.22 + nebColor * 0.08;
+
+    // Boss fights pull the backdrop toward a dark crimson.
+    vec3 bossTint = vec3(1.25, 0.45, 0.55);
+    color *= mix(vec3(1.0), bossTint, boss * 0.8);
+
+    color *= material_params.tint.rgb * material_params.tint.a;
+    material.base_color = vec4(color, 1.0);
+  }
+}
