@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/rendering.dart';
 
+import '../game/audio_unlock/audio_unlock.dart';
 import '../game/game_controller.dart';
 import '../game/sim/power_up_type.dart';
 import '../main.dart' as app;
@@ -63,6 +64,7 @@ Future<void> _report() async {
   final text = [
     'UA: ${userAgent()}',
     'phase: ${c?.phase.name} fps: ${c?.fps}',
+    'audio ready: ${c?.audio.ready} context: ${audioContextState()}',
     ..._log,
   ].join('\n');
   try {

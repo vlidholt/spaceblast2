@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -104,6 +105,11 @@ class GameController extends ChangeNotifier {
     _setPhase(GamePhase.menu);
     _shipAppearTime = time;
     loadProgress.value = 1.0;
+    // Start the audio engine right away (browsers keep it suspended until
+    // the first tap, which then unlocks it). Starting it only on that tap
+    // is too late for mobile Safari, where it would stay silent.
+    audio.playMusic('music_intro');
+    unawaited(audio.start());
   }
 
   void _setPhase(GamePhase phase) {
@@ -116,15 +122,7 @@ class GameController extends ChangeNotifier {
 
   /// Any user gesture: the browser allows audio to start from here on.
   void userGesture() {
-    if (!audio.ready) {
-      audio.start().then((_) {
-        audio.playMusic(
-          _phase == GamePhase.playing || _phase == GamePhase.launching
-              ? 'music_game'
-              : 'music_intro',
-        );
-      });
-    }
+    if (!audio.ready) unawaited(audio.start());
   }
 
   // --- Menu actions -----------------------------------------------------------

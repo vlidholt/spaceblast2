@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
+import 'audio_unlock/audio_unlock.dart';
+
 /// Sound effects and music. Audio is optional: if the device (or browser)
 /// refuses to start, the game plays silently.
 class AudioManager {
@@ -44,11 +46,13 @@ class AudioManager {
 
   double musicVolume = 0.55;
 
-  /// Starts the audio engine. On the web this must happen after a user
-  /// gesture, so it is safe to call repeatedly from input handlers.
+  /// Starts the audio engine. Safe to call repeatedly. On the web the
+  /// engine starts suspended and is unlocked by the first user gesture (see
+  /// installAudioUnlock).
   Future<void> start() async {
     if (_ready || _starting) return;
     _starting = true;
+    installAudioUnlock();
     try {
       final soloud = SoLoud.instance;
       if (!soloud.isInitialized) {
