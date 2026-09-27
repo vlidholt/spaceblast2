@@ -18,29 +18,49 @@ class _SplitScreenShellState extends State<SplitScreenShell> {
   final GameController _controller = GameController();
   ClassicAssets? _assets;
 
+  /// The mouse cursor is hidden while it holds the joystick, so it stays out
+  /// of screen recordings.
+  final ValueNotifier<bool> _hideCursor = ValueNotifier(false);
+
   @override
   void initState() {
     super.initState();
+    _controller.frame.addListener(_updateCursor);
     ClassicAssets.load().then((assets) {
       if (mounted) setState(() => _assets = assets);
     });
   }
 
+  void _updateCursor() {
+    _hideCursor.value =
+        _controller.phase == GamePhase.playing &&
+        _controller.world.joystick.isDown;
+  }
+
   @override
   void dispose() {
+    _controller.frame.removeListener(_updateCursor);
     _controller.dispose();
+    _hideCursor.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(child: _classicSide()),
-        Container(width: 2.0, color: const Color(0xFF000000)),
-        Expanded(child: GameShell(controller: _controller)),
-      ],
+    return ValueListenableBuilder<bool>(
+      valueListenable: _hideCursor,
+      builder: (context, hide, child) => MouseRegion(
+        cursor: hide ? SystemMouseCursors.none : MouseCursor.defer,
+        child: child,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: _classicSide()),
+          Container(width: 2.0, color: const Color(0xFF000000)),
+          Expanded(child: GameShell(controller: _controller)),
+        ],
+      ),
     );
   }
 

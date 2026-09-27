@@ -76,6 +76,8 @@ class _BorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final t = c.time;
+    // The blobs are larger than the side strips; keep them off neighbors.
+    canvas.clipRect(Offset.zero & size);
     canvas.drawRect(
       Offset.zero & size,
       Paint()..color = const Color(0xFF05030F),
